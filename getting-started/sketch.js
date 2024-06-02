@@ -1,3 +1,9 @@
+const BLOCK_SIZE = 10
+
+let grid
+let cols, rows
+let hue = 200
+
 function make2dArray(cols, rows) {
   let arr = new Array(cols)
   for (let i = 0; i < arr.length; i++) {
@@ -9,27 +15,30 @@ function make2dArray(cols, rows) {
   return arr
 }
 
-let grid
-let blockSize = 10
-let cols, rows
-let hue = 200
-
 function setup() {
   createCanvas(windowWidth, windowHeight)
   colorMode(HSB, 360, 255, 255)
-  cols = floor(width / blockSize)
-  rows = floor(height / blockSize)
+  cols = floor(width / BLOCK_SIZE)
+  rows = floor(height / BLOCK_SIZE)
   grid = make2dArray(cols, rows)
 }
 
 function mouseDragged() {
-  let col = floor(mouseX / blockSize)
-  let row = floor(mouseY / blockSize)
+  let mouseCol = floor(mouseX / BLOCK_SIZE)
+  let mouseRow = floor(mouseY / BLOCK_SIZE)
 
-  if (col >= 0 && col < cols && row >= 0 && row < rows) {
-    grid[col][row] = hue
+  let ext = 2
+  for (let i = -ext; i <= ext; i++) {
+    for (let j = -ext; j <= ext; j++) {
+      if (random(1) < 0.75) {
+        let col = mouseCol + i;
+        let row = mouseRow + j;
+        if (mouseCol >= 0 && mouseCol < cols && mouseRow >= 0 && mouseRow < rows) {
+          grid[col][row] = hue
+        }
+      }
+    }
   }
-
   hue = hue > 360 ? 1 : hue + 1
 }
 
@@ -40,9 +49,9 @@ function draw() {
       noStroke()
       if (grid[i][j] > 0) {
         fill(grid[i][j], 255, 255)
-        let x = i * blockSize
-        let y = j * blockSize
-        square(x, y, blockSize)
+        let x = i * BLOCK_SIZE
+        let y = j * BLOCK_SIZE
+        square(x, y, BLOCK_SIZE)
       }
     }
   }
