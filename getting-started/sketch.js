@@ -2,7 +2,7 @@ function make2dArray(cols, rows) {
   let arr = new Array(cols);
   for (let i = 0; i < arr.length; i++) {
     arr[i] = new Array(rows);
-    for (let j = 0; j < arr.length; j++) {
+    for (let j = 0; j < arr[i].length; j++) {
       arr[i][j] = 0;
     }
   }
@@ -10,14 +10,13 @@ function make2dArray(cols, rows) {
 }
 
 let grid;
-let w = 30;
+let blockSize = 10;
 let cols, rows;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  console.log(width)
-  cols = floor(width / w);
-  rows = floor(height / w);
+  cols = floor(width / blockSize);
+  rows = floor(height / blockSize);
   grid = make2dArray(cols, rows);
 
   for (let i = 0; i < cols; i++) {
@@ -27,43 +26,47 @@ function setup() {
   }
 }
 
-function mouseDragged() {
-  let col = floor(mouseX / w)
-  let row = floor(mouseY / w)
+function mouseClicked() {
+  let col = floor(mouseX / blockSize)
+  let row = floor(mouseY / blockSize)
 
-  grid[col][row] = 1
-
-
+  if (col >= 0 && col < cols && row >= 0 && row < rows) {
+    grid[col][row] = 1
+  }
 }
 
 function draw() {
-  background('#000000');
+  background(0);
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      stroke(255)
-      fill(grid[i][j] * 255);
-      let x = i * w
-      let y = j * w
-      square(x, y, w)
-
-      // noStroke()
-      // if (grid[i][j] == 1) {
-      //   fill(255)
-      //   let x = i * w
-      //   let y = j * w
-      //   square(x, y, w)
-      // }
+      noStroke()
+      if (grid[i][j] == 1) {
+        fill(255)
+        let x = i * blockSize
+        let y = j * blockSize
+        square(x, y, blockSize)
+      }
     }
   }
 
   let nextGrid = make2dArray(cols, rows)
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      let state = grid[i][j]
-      if (state === 1) {
+
+      let curr = grid[i][j]
+      if (curr === 1) {
+        let dir = Math.random() < 0.5 ? -1 : 1;
         let below = grid[i][j + 1]
-        if (below === 0 && j < rows - 1) {
+
+        let belowA = i + dir >= 0 && i + dir < cols ? grid[i + dir][j + 1] : -1;
+        let belowB = i - dir >= 0 && i - dir < cols ? grid[i - dir][j + 1] : -1;
+
+        if (below === 0) {
           nextGrid[i][j + 1] = 1
+        } else if (belowA === 0) {
+          nextGrid[i + dir][j + 1] = curr;
+        } else if (belowB === 0) {
+          nextGrid[i - dir][j + 1] = curr;
         } else {
           nextGrid[i][j] = 1
         }
